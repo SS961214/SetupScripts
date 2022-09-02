@@ -33,6 +33,7 @@ if lspci | grep -i nvidia; then
 		sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
 		sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 	apt update;
+	apt install -y nvidia-driver-515;
 	apt install -y nvidia-docker2;
 	systemctl restart docker;
 fi
