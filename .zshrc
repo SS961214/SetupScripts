@@ -1,13 +1,5 @@
 # Created by newuser for 5.8
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-	  eval "$(pyenv init -)"
-fi
-
 export LC_TIME=en_GB.UTF-8
-
-source /etc/bashrc 2>/dev/null
 export CC=gcc
 export HISTFILE=${HOME}/.zhistory
 export HISTSIZE=1000
@@ -42,19 +34,23 @@ alias crontab='crontab -i'
 alias python='python3'
 alias pip='python3 -m pip'
 
+
 autoload -Uz compinit && compinit
-zstyle ':completion:*' menu select #補完のリストの、選択している部分を塗りつぶす
+zstyle ':completion:*' menu select
+
+# <<< Get information from a version control system: git
 autoload -Uz vcs_info
 zstyle ':vcs_info:git:*' check-for-changes true
 zstyle ':vcs_info:git:*' stagedstr "%F{cyan}"
 zstyle ':vcs_info:git:*' unstagedstr "%F{magenta}"
 zstyle ':vcs_info:git:*' formats '%u%c(%r)-[%b]%f' '%c%u %m'
 zstyle ':vcs_info:git:*' actionformats '%u%c(%r)-[%b|%a]%f' '%c%u %m'
+# >>> Get information from a version control system: git
 
-# prompt
+# <<< prompt
 precmd () {
   Date=$(date "+%Y/%m/%d")
-  PROMPT="%F{%(?.cyan.red)}$Date %* %d%f"
+  PROMPT="%(?.%F{cyan}.%F{red})$Date %* %d%f"
   PROMPT+="
   %(?..%F{red})%n@%m %(?..(%?%)%f)%# "
 }
@@ -62,25 +58,20 @@ precmd_vcs_info() { vcs_info }
 precmd_functions+=( precmd_vcs_info )
 setopt prompt_subst
 RPROMPT='${vcs_info_msg_0_}'
+# >>> prompt
 
-export PATH=/usr/local/bin:$PATH
-
-if [ -e "/opt/intel/oneapi/setvars.sh" ]; then
+if [ -e "/usr/local/bin" ] && [ ! `echo $PATH | grep /usr/local/bin` ]; then
+	export PATH=/usr/local/bin:$PATH
+fi
+if [ -e "/opt/intel/oneapi/setvars.sh" ] && [ -z "$MKLROOT" ]; then
   source /opt/intel/oneapi/setvars.sh --force
 fi
 
-echo "# >>> conda initialize >>>"
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/shoki/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/shoki/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/shoki/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/shoki/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+exist () {
+	if [ `which $1` ]; then
+		echo `which $1`;
+		return 0;
+	else
+		return 1;
+	fi
+}
