@@ -12,7 +12,14 @@ apt-get install -y zsh
 
 if ! dpkg -l ibus-mozc 2>&1 > /dev/null
 then
-	apt-get install -y ibus-mozc
+	sed -i 's/# deb-src/deb-src/g' /etc/apt/sources.list
+ 	agt-get update
+	apt-get install -y build-essential devscripts
+	apt-get build-dep -y ibus-mozc
+	apt-get source ibus-mozc
+ 	cd mozc*
+	dpkg-buildpackage -us -uc -b
+	sudo dpkg -i ../mozc*.deb ../ibus-mozc*.deb
 	echo;
 	echo "${cBegin}To set Japanse input as default, please try the following command.${cEnd}"
 	echo "${cBegin}    echo \"active_on_launch: True\" >> \$HOME/.config/mozc/ibus_config.textproto${cEnd}"
